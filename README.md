@@ -110,3 +110,38 @@ public async register({request, response}: HttpContextContract) {
     return response.json({"username": `${username}`, "email": `${email}`})
 }
 ```
+
+## Middleware
+Allows to intercept request before they reach the controller, typically ised for auth, logging, request modification, etc...
+
+```
+node ace make:middleware LogRequest
+```
+```{App/Middleware/LogRequest.ts}
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+export default class LogRequest {
+  public async handle({request}: HttpContextContract, next: () => Promise<void>) {
+    console.log(`Intercepting request METHOD:${request.method()} ROUTE:${request.url()}`)
+    await next()
+  }
+}
+```
+Inside start/kernel.ts we define it either globally 
+```
+Server.middleware.register([
+  () => import('App/Middleware/LogRequest.ts'),
+])
+```
+register contains an array of middlewares of the form () => import('middlewarePath')
+
+Or locally to a certain route in registerName (store a key value pair of middlewares for specific routes)
+```
+Server.middleware.registerNamed({
+  auth: () => import('App/Middleware/LogRequest')
+})
+```
+then in start/routes.ts (only for registred middlewares)
+```
+Route.post('/register', new UsersController().display).middleware('auth')
+```

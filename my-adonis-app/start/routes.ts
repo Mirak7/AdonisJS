@@ -19,7 +19,11 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import UsersController from 'App/Controllers/Http/UsersController'
 
 Route.get('/', async () => {
   return { hello: 'world' }
 })
+Route.get('/greet', new UsersController().greet)
+Route.get('/greet/:name', new UsersController().show)
+Route.post('/register', new UsersController().display).middleware('auth')
