@@ -1,1 +1,40 @@
-./DS_Store
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-lock.yaml
+package-lock.json
+.yarn/
+.pnp.*
+
+# AdonisJS build files
+build/
+.tmp/
+public/hot
+public/storage
+
+# Environment files
+.env
+.env.example
+
+# Logs & debug
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+dump.rdb
+debug.log
+.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# TypeScript compilation files
+tsconfig.tsbuildinfo
+
+# Misc
+coverage/
