@@ -143,5 +143,41 @@ Server.middleware.registerNamed({
 ```
 then in start/routes.ts (only for registred middlewares)
 ```
-Route.post('/register', new UsersController().display).middleware('auth')
+import { middleware } from '#start/kernel'
+Route.post('/register', new UsersController().display).use(middleware.auth())
+```
+
+## Validator
+Validators in AdonisJS ensures the user submitted valid data (length, size, alphanumeric, email, etc...)
+```
+node ace make:validator registerUser
+```
+
+The validators use Vine as its easier and already pre configured but can use any other library
+```
+export const registerUserValidator = vine.compile(
+  vine.object({
+    username: vine.string().trim().alphanumeric(),
+    email: vine.string().email(),
+    password: vine.string().alphanumeric().minLength(6)
+  })
+)
+```
+
+then in the controller
+```
+import type { HttpContext } from '@adonisjs/core/http'
+import { registerUserValidator } from '#validators/register_user'
+
+export default class UsersController {
+    public async register({request}: HttpContext) {
+        const data = request.all()
+        const payload = registerUserValidator.validate(data)
+        return payload
+    }
+}
+```
+or directly
+```
+const payload = await request.validateUsing(updatePostValidator)
 ```
