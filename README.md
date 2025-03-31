@@ -181,3 +181,102 @@ or directly
 ```
 const payload = await request.validateUsing(updatePostValidator)
 ```
+
+## Database ORM
+```
+node ace add @adonisjs/lucid
+```
+### Schema
+To define a table schema we use migrations
+```
+node ace make:migration users
+```
+
+Create the users table schema with constraints
+```
+table.increments('id')
+table.string('username').notNullable().unique()
+table.string('email').primary()
+table.string('password').notNullable()
+```
+
+```
+node ace migration:run
+```
+Applies all migrations pending (and create the table if do not exists)
+
+### Models
+Models are representations of a databae table, it allows to interact with the database using queries instead of writing raw SQL
+used in controllers & servies to retrieve, insert update and delete records
+
+```
+node ace make:model User
+```
+e.g
+```
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+
+export default class User extends BaseModel {
+  @column({ isPrimary: true })
+  public id: number
+
+  @column()
+  public username: string
+
+  @column()
+  public email: string
+
+  @column({ serializeAs: null })  // Hides password when returning JSON
+  public password: string
+}
+```
+
+### CRUD operations
+To perform crud operations we use ORM methods
+- create() 
+- save() (performs insert new data then update when the model has persisted)
+- createMany
+
+e.g in controller to create a new user (or update it)
+```
+const user = new User()
+
+user.username = payload.username
+user.email = payload.email
+user.password = payload.password
+await user.save()
+```
+
+
+To read data we can either 
+```
+const user = await User.all()
+// SELECT * FROM "users" ORDER BY "id" DESC;
+```
+to retrieve all the records
+
+or retrieve by ID
+```
+const user = await User.find(1)
+// SELECT * FROM "users" WHERE "id" = 1 LIMIT 1;
+```
+
+or retrieve by column name and its value
+```
+const user = await User.findBy('email', 'example@mail.com')
+SELECT * FROM "users" WHERE "email" = 'example@mail.com' LIMIT 1;
+```
+
+or can combine findAll and findBy
+```
+const posts = await Post.findManyBy({ status: 'published', userId: 1 })
+// SQL: SELECT * from "posts" WHERE "status" = 'published' AND "userId"
+```
+
+We can also use the QueryBuilder
+```
+const users = await User
+.query()
+.where('countryCode', 'IN')
+.orWhereNull('countryCode')
+```
